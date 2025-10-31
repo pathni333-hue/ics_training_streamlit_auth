@@ -1,3 +1,29 @@
+import sys
+import os
+import streamlit as st
+
+# Ensure project root is in Python path (for reliable module imports)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_dir)
+
+# Optional: if running one level above, add parent directory too
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+# Import app modules
+from modules import (
+    segmentation,
+    asset_lab,
+    risk_workshop,
+    threat_mapping,
+    incident_response,
+    hygiene_dashboard
+)
+
+# Local components
+import db
+import report
 import streamlit as st
 from modules import (
     segmentation,
