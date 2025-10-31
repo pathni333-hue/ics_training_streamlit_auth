@@ -1,6 +1,8 @@
 import streamlit as st
 from modules import segmentation, asset_lab, risk_workshop, threat_mapping, incident_response, hygiene_dashboard
-import db, report, os
+import db
+import report
+import os
 
 st.set_page_config(page_title="OT/ICS Training Platform (Auth)", layout="wide")
 db.init_db()
@@ -10,14 +12,16 @@ def login_page():
     username = st.text_input('Username')
     password = st.text_input('Password', type='password')
     col1, col2 = st.columns(2)
+
     with col1:
         if st.button('Login'):
             uid = db.verify_user(username, password)
             if uid:
-                st.session_state['user'] = {'id':uid,'username':username}
+                st.session_state['user'] = {'id': uid, 'username': username}
                 st.success('Logged in.')
             else:
                 st.error('Invalid credentials.')
+
     with col2:
         if st.button('Register'):
             ok = db.add_user(username, password)
@@ -56,10 +60,10 @@ def main_app():
         prog = db.get_progress(st.session_state['user']['id'])
         st.subheader('My Progress')
         st.write('Recent activity:')
-        st.dataframe([{'module':p['module'],'score':p['score'],'timestamp':p['timestamp']} for p in prog])
-        # PDF export
+        st.dataframe([{'module': p['module'], 'score': p['score'], 'timestamp': p['timestamp']} for p in prog])
+
         if st.button('Download My Report (PDF)'):
-            out_dir = os.path.join('data','reports')
+            out_dir = os.path.join('data', 'reports')
             os.makedirs(out_dir, exist_ok=True)
             out_path = os.path.join(out_dir, f"report_{st.session_state['user']['username']}.pdf")
             report.generate_user_report(st.session_state['user']['username'], prog, out_path)
@@ -71,10 +75,10 @@ def main_app():
     st.sidebar.markdown('- Example datasets are in the `data/` folder.')
     st.sidebar.markdown('- Expand modules in `modules/` to customise content.')
 
-    # run module app with saving callback available
     module.app(user_context={'user_id': st.session_state['user']['id'], 'username': st.session_state['user']['username']})
 
 if 'user' not in st.session_state:
     login_page()
 else:
     main_app()
+
